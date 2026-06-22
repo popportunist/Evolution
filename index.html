@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RE: EVOLUTION - TERMINAL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap');
+
+        body {
+            font-family: 'Fira Code', monospace;
+            background-color: #050505;
+            color: #00ff00;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #004400; 
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff00; 
+        }
+
+        /* Terminal scanline effect */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.3;
+        }
+
+        .panel-border {
+            border: 1px solid #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.1) inset;
+        }
+
+        .btn-glitch:active {
+            transform: translate(2px, 2px);
+        }
+
+        .splat-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(200, 0, 0, 0.95);
+            z-index: 100;
+            color: black;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: pulseBg 2s infinite alternate;
+        }
+
+        @keyframes pulseBg {
+            0% { background-color: rgba(150, 0, 0, 0.95); }
+            100% { background-color: rgba(255, 0, 0, 0.95); }
+        }
+
+        /* Custom Checkboxes */
+        input[type="checkbox"] {
+            appearance: none;
+            background-color: #000;
+            border: 1px solid #00ff00;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: 'X';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00ff00;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .text-neon-red { color: #ff003c; }
+        .border-neon-red { border-color: #ff003c; }
+    </style>
+</head>
+<body class="antialiased min-h-screen p-4 sm:p-8 flex flex-col relative">
+
+    <div class="scanlines"></div>
+
+    <header class="mb-8 border-b-2 border-green-500 pb-4">
+    <div class="flex flex-col md:flex-row justify-between items-end gap-4">
+        <div>
+            <h1 class="text-3xl sm:text-5xl font-bold tracking-tighter">RE: EVOLUTION</h1>
+            <p class="text-sm sm:text-base mt-2 opacity-80">> SYSTEM ARCHITECTURE ARCHIVE v2.0</p>
+                <p class="text-xs text-neon-red mt-1 animate-pulse">> HARD MODE ENGAGED</p>
+            </div>
+            <div class="text-right">
+                <div class="text-xs opacity-60">SESSION DAY</div>
+                <div class="text-3xl font-bold" id="session-day">00</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col gap-8">
+        
+        <!-- SYSTEM STATUS CARDS -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- WIL CARD -->
+            <div class="panel-border bg-black p-5 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-2 text-xs opacity-30">TRACK 1</div>
+                <h2 class="text-2xl font-bold border-b border-green-500/30 pb-2 mb-4">WIL <span class="text-xs font-normal opacity-70">(Sovereignty)</span></h2>
+                
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <div class="text-[0.65rem] opacity-60 uppercase">Points</div>
+                        <div class="text-4xl font-bold" id="wil-points">0</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[0.65rem] opacity-60 uppercase">Consecutive Streak</div>
+                        <div class="text-xl text-blue-400" id="wil-streak">0 Days</div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 border border-green-500/20 p-3 mb-2">
+                    <div class="text-xs opacity-50 mb-1">CURRENT FORM</div>
+                    <div class="font-bold text-lg text-white" id="wil-rank">Base Slime</div>
+                </div>
+                
+                <div class="bg-gray-900 border border-green-500/20 p-3">
+                    <div class="text-xs opacity-50 mb-1">BOUNDARY/PERMISSION</div>
+                    <div class="text-sm font-semibold text-yellow-500" id="wil-boundary">Confinement: Jelebu Road</div>
+                </div>
+            </div>
+
+            <!-- VIT CARD -->
+            <div class="panel-border bg-black p-5 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-2 text-xs opacity-30">TRACK 2</div>
+                <h2 class="text-2xl font-bold border-b border-green-500/30 pb-2 mb-4">VIT <span class="text-xs font-normal opacity-70">(Physical)</span></h2>
+                
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <div class="text-[0.65rem] opacity-60 uppercase">Points</div>
+                        <div class="text-4xl font-bold" id="vit-points">0</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[0.65rem] opacity-60 uppercase">Consecutive Streak</div>
+                        <div class="text-xl text-blue-400" id="vit-streak">0 Days</div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 border border-green-500/20 p-3 mb-2">
+                    <div class="text-xs opacity-50 mb-1">CURRENT RANK</div>
+                    <div class="font-bold text-lg text-white" id="vit-rank">Base Slime</div>
+                </div>
+                
+                <div class="bg-gray-900 border border-green-500/20 p-3">
+                    <div class="text-xs opacity-50 mb-1">MILESTONE / STATUS</div>
+                    <div class="text-sm font-semibold text-purple-400" id="vit-milestone">Default</div>
+                </div>
+            </div>
+
+            <!-- MND CARD -->
+            <div class="panel-border bg-black p-5 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-2 text-xs opacity-30">TRACK 3</div>
+                <h2 class="text-2xl font-bold border-b border-green-500/30 pb-2 mb-4">MND <span class="text-xs font-normal opacity-70">(Cognitive)</span></h2>
+                
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <div class="text-[0.65rem] opacity-60 uppercase">Points</div>
+                        <div class="text-4xl font-bold" id="mnd-points">0</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[0.65rem] opacity-60 uppercase">Consecutive Streak</div>
+                        <div class="text-xl text-blue-400" id="mnd-streak">0 Days</div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 border border-green-500/20 p-3 mb-2">
+                    <div class="text-xs opacity-50 mb-1">CURRENT RANK</div>
+                    <div class="font-bold text-lg text-white" id="mnd-rank">Unranked</div>
+                </div>
+                
+                <div class="bg-gray-900 border border-green-500/20 p-3">
+                    <div class="text-xs opacity-50 mb-1">GATE / PHASE</div>
+                    <div class="text-sm font-semibold text-cyan-400" id="mnd-milestone">Establishing Baseline</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- DAILY OPERATIONAL SYNTAX LOG -->
+        <section class="panel-border bg-[#0a0a0a] p-6 lg:p-8 mt-4">
+            <h3 class="text-xl font-bold mb-6">> INITIALIZE DAILY LOG</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Gains -->
+                <div class="space-y-6">
+                    <div>
+                        <div class="text-sm opacity-70 mb-3 border-b border-green-900 pb-1">VIT LOG (Max +2)</div>
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-green-900/20 p-2 transition-colors">
+                            <input type="checkbox" id="chk-cardio">
+                            <span>[Cardio: Zone 2 Executed]</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-green-900/20 p-2 transition-colors">
+                            <input type="checkbox" id="chk-gym">
+                            <span>[Gym: Compound Lifts Executed]</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <div class="text-sm opacity-70 mb-3 border-b border-green-900 pb-1">MND LOG (Max +2)</div>
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-green-900/20 p-2 transition-colors">
+                            <input type="checkbox" id="chk-guitar">
+                            <span>[Guitar: Practice Executed]</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer hover:bg-green-900/20 p-2 transition-colors">
+                            <input type="checkbox" id="chk-japanese">
+                            <span>[Japanese: Study Executed]</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Splat Threat -->
+                <div class="flex flex-col justify-between border-l-0 md:border-l border-green-900 md:pl-8">
+                    <div>
+                        <div class="text-sm opacity-70 mb-3 border-b border-red-900 pb-1 text-neon-red">WIL LOG: THE SPLAT CLAUSE</div>
+                        <p class="text-xs text-gray-400 mb-4">A single puff triggers a Total Cellular Wipe. Pools reset to 0. Evolution drops to Base Slime. Confinement to Jelebu Road.</p>
+                        
+                        <div class="space-y-3">
+                            <label class="flex items-center space-x-3 cursor-pointer bg-green-900/20 p-3 border border-green-500/30">
+                                <input type="radio" name="nicotine" id="rad-secure" value="secure" checked>
+                                <span class="font-bold text-green-400">SECURE: Absolute Zero Nicotine</span>
+                            </label>
+                            
+                            <label class="flex items-center space-x-3 cursor-pointer bg-red-900/20 p-3 border border-neon-red/30">
+                                <input type="radio" name="nicotine" id="rad-breach" value="breach">
+                                <span class="font-bold text-neon-red">BREACHED: System Compromised</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button onclick="submitDailyLog()" class="mt-6 w-full bg-green-900 hover:bg-green-700 text-black font-bold py-4 px-4 btn-glitch border-2 border-green-500 transition-all uppercase tracking-widest text-lg">
+                        Execute Sequence
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MATRICES REFERENCE -->
+        <section class="mt-8 space-y-4">
+            <details class="panel-border bg-black p-4 cursor-pointer group">
+                <summary class="font-bold text-lg outline-none select-none">>> VIEW EVOLUTIONARY MATRICES</summary>
+                <div class="mt-4 space-y-6 text-sm border-t border-green-900 pt-4 cursor-default">
+                    
+                    <div>
+                        <h4 class="font-bold text-white mb-2">Track 1: WIL (Geographic Sovereignty)</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead><tr class="bg-green-900/30"><th class="p-2 border border-green-900">WIL</th><th class="p-2 border border-green-900">Form</th><th class="p-2 border border-green-900">Boundary</th></tr></thead>
+                                <tbody>
+                                    <tr><td class="p-2 border border-green-900">0-2</td><td class="p-2 border border-green-900">Base Slime</td><td class="p-2 border border-green-900">Jelebu Road only</td></tr>
+                                    <tr><td class="p-2 border border-green-900">3-4</td><td class="p-2 border border-green-900">Slime (+1)</td><td class="p-2 border border-green-900">Bukit Panjang accessible</td></tr>
+                                    <tr><td class="p-2 border border-green-900">5-6</td><td class="p-2 border border-green-900">Slime (+2)</td><td class="p-2 border border-green-900">BP & Beauty World</td></tr>
+                                    <tr><td class="p-2 border border-green-900">7-13</td><td class="p-2 border border-green-900">Slime (Max)</td><td class="p-2 border border-green-900">ISLAND MAP UNLOCK</td></tr>
+                                    <tr><td class="p-2 border border-green-900">14-20</td><td class="p-2 border border-green-900">Slime (Max)</td><td class="p-2 border border-green-900">Island Map active</td></tr>
+                                    <tr><td class="p-2 border border-green-900">21-27</td><td class="p-2 border border-green-900">Slime (Max)</td><td class="p-2 border border-green-900">Physical Crucible unlocked</td></tr>
+                                    <tr><td class="p-2 border border-green-900">28+</td><td class="p-2 border border-green-900">Slime (Max)</td><td class="p-2 border border-green-900">PLANE UNLOCK</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold text-white mb-2">Track 2: VIT (Requires +2/day to hold streak)</h4>
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead><tr class="bg-green-900/30"><th class="p-2 border border-green-900">Days</th><th class="p-2 border border-green-900">Rank</th></tr></thead>
+                                <tbody>
+                                    <tr><td class="p-2 border border-green-900">0</td><td class="p-2 border border-green-900">Base Slime</td></tr>
+                                    <tr><td class="p-2 border border-green-900">7</td><td class="p-2 border border-green-900">Goblin</td></tr>
+                                    <tr><td class="p-2 border border-green-900">14</td><td class="p-2 border border-green-900">Goblin (Hob)</td></tr>
+                                    <tr><td class="p-2 border border-green-900">21</td><td class="p-2 border border-green-900">Orc Aspirant (Crucible)</td></tr>
+                                    <tr><td class="p-2 border border-green-900">28</td><td class="p-2 border border-green-900">Orc</td></tr>
+                                    <tr><td class="p-2 border border-green-900">56</td><td class="p-2 border border-green-900">Battle Orc</td></tr>
+                                    <tr><td class="p-2 border border-green-900">84</td><td class="p-2 border border-green-900">Ogre Master</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-white mb-2">Track 3: MND (Requires +2/day to hold streak)</h4>
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead><tr class="bg-green-900/30"><th class="p-2 border border-green-900">Days</th><th class="p-2 border border-green-900">Rank</th></tr></thead>
+                                <tbody>
+                                    <tr><td class="p-2 border border-green-900">0</td><td class="p-2 border border-green-900">Unranked</td></tr>
+                                    <tr><td class="p-2 border border-green-900">7</td><td class="p-2 border border-green-900">Student</td></tr>
+                                    <tr><td class="p-2 border border-green-900">14</td><td class="p-2 border border-green-900">Recluse</td></tr>
+                                    <tr><td class="p-2 border border-green-900">21</td><td class="p-2 border border-green-900">Hermit</td></tr>
+                                    <tr><td class="p-2 border border-green-900">28</td><td class="p-2 border border-green-900">Monk (Synth Gate 1)</td></tr>
+                                    <tr><td class="p-2 border border-green-900">56</td><td class="p-2 border border-green-900">Elder Monk</td></tr>
+                                    <tr><td class="p-2 border border-green-900">84</td><td class="p-2 border border-green-900">Sage</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </details>
+        </section>
+
+    </main>
+
+    <!-- NOTIFICATION SYSTEM -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <!-- SPLAT OVERLAY -->
+    <div id="splat-screen" class="splat-overlay">
+        <h1 class="text-6xl md:text-8xl font-black mb-4 tracking-tighter uppercase" style="text-shadow: 4px 4px 0 #fff;">SPLAT.</h1>
+        <h2 class="text-2xl md:text-4xl font-bold mb-8">TOTAL CELLULAR WIPE INITIATED</h2>
+        <div class="bg-black text-neon-red border-4 border-neon-red p-6 max-w-2xl text-left">
+            <p class="mb-2">> CRITICAL FAILURE DETECTED.</p>
+            <p class="mb-2">> ALL ARRAYS PURGED.</p>
+            <p class="mb-2">> EVOLUTIONARY STATUS REVOKED (BASE SLIME).</p>
+            <p class="mb-6">> QUARANTINE PROTOCOL: 48 HOURS LOCKED.</p>
+            <button onclick="acknowledgeSplat()" class="w-full bg-neon-red text-black font-bold py-3 hover:bg-white hover:text-black transition-colors uppercase">
+                Acknowledge Failure
+            </button>
+        </div>
+    </div>
+
+    <!-- CUSTOM MESSAGE BOX FOR ERRORS -->
+    <div id="msg-box" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center">
+        <div class="panel-border bg-black p-6 max-w-md w-full mx-4">
+            <h3 id="msg-title" class="text-xl font-bold mb-4 text-yellow-500">SYSTEM MESSAGE</h3>
+            <p id="msg-content" class="mb-6">Content</p>
+            <button onclick="closeMsgBox()" class="w-full border border-green-500 p-2 hover:bg-green-900/30">DISMISS</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Setup Firebase Database
+        let firebaseConfig;
+        if (typeof __firebase_config !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+        } else {
+            // DEPLOYMENT NOTE FOR GITHUB: 
+            // You MUST replace this object with your own free Firebase config from console.firebase.google.com
+            // Otherwise, database saving will not work when hosted on GitHub.
+            firebaseConfig = {
+                apiKey: "YOUR_API_KEY",
+                authDomain: "YOUR_PROJECT.firebaseapp.com",
+                projectId: "YOUR_PROJECT_ID",
+                storageBucket: "YOUR_PROJECT.appspot.com",
+                messagingSenderId: "YOUR_SENDER_ID",
+                appId: "YOUR_APP_ID"
+            };
+        }
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 're-evolution-tracker';
+        let currentUser = null;
+
+        // System State
+        let state = {
+            sessionDay: 1,
+            wil: { points: 0, streak: 0 },
+            vit: { points: 0, streak: 0 },
+            mnd: { points: 0, streak: 0 },
+            quarantineUnlockTime: null
+        };
+
+        // DOM Elements Maps
+        const UI = {
+            sessionDay: document.getElementById('session-day'),
+            wilPoints: document.getElementById('wil-points'),
+            wilStreak: document.getElementById('wil-streak'),
+            wilRank: document.getElementById('wil-rank'),
+            wilBoundary: document.getElementById('wil-boundary'),
+            vitPoints: document.getElementById('vit-points'),
+            vitStreak: document.getElementById('vit-streak'),
+            vitRank: document.getElementById('vit-rank'),
+            vitMilestone: document.getElementById('vit-milestone'),
+            mndPoints: document.getElementById('mnd-points'),
+            mndStreak: document.getElementById('mnd-streak'),
+            mndRank: document.getElementById('mnd-rank'),
+            mndMilestone: document.getElementById('mnd-milestone'),
+            splatScreen: document.getElementById('splat-screen')
+        };
+
+        // Initialize Authentication
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth failed:", error);
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if (user) {
+                showToast("System Link Established. Accessing DB.", "info");
+                await loadStateFromFirestore();
+                updateDashboard();
+            }
+        });
+
+        initAuth();
+
+        // Database Functions
+        async function loadStateFromFirestore() {
+            if (!currentUser) return;
+            try {
+                const stateRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'trackerState');
+                const docSnap = await getDoc(stateRef);
+                if (docSnap.exists()) {
+                    state = docSnap.data();
+                } else {
+                    await setDoc(stateRef, state);
+                }
+            } catch (error) {
+                console.error("DB Load Error", error);
+            }
+        }
+
+        async function saveStateToFirestore() {
+            if (!currentUser) return;
+            try {
+                const stateRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'trackerState');
+                await setDoc(stateRef, state);
+            } catch (error) {
+                showToast("Error saving state to DB.", "danger");
+            }
+        }
+
+        async function logInputsToDatabase(inputs) {
+            if (!currentUser) return;
+            try {
+                const logsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'dailyLogs');
+                await addDoc(logsRef, {
+                    ...inputs,
+                    timestamp: new Date().toISOString(),
+                    sessionDayLogged: state.sessionDay
+                });
+            } catch (error) {
+                console.error("Log Error", error);
+            }
+        }
+
+        // Logic Helpers
+        function getWilStatus(points) {
+            if(points < 3) return { rank: "Base Slime", bounds: "Confinement: Jelebu Road", color: "text-gray-500" };
+            if(points < 5) return { rank: "Slime (+1)", bounds: "Local: Bukit Panjang", color: "text-green-500" };
+            if(points < 7) return { rank: "Slime (+2)", bounds: "Corridor: BP & Beauty World", color: "text-green-400" };
+            if(points < 14) return { rank: "Slime (Max)", bounds: "ISLAND MAP: Full SG Access", color: "text-blue-400" };
+            if(points < 21) return { rank: "Slime (Max)", bounds: "Island Map Active", color: "text-purple-400" };
+            if(points < 28) return { rank: "Slime (Max)", bounds: "Island Map + Physical Crucible", color: "text-purple-300" };
+            return { rank: "Slime (Max)", bounds: "PLANE UNLOCK: Global Travel", color: "text-yellow-400" };
+        }
+
+        function getVitStatus(streak) {
+            if(streak < 7) return { rank: "Base Slime", milestone: "Default", color: "text-gray-500" };
+            if(streak < 14) return { rank: "Goblin", milestone: "Vocation Shift", color: "text-green-500" };
+            if(streak < 21) return { rank: "Goblin (Hob)", milestone: "Hardened State", color: "text-green-400" };
+            if(streak < 28) return { rank: "Orc Aspirant", milestone: "Physical Crucible Unlocked", color: "text-purple-400" };
+            if(streak < 56) return { rank: "Orc", milestone: "Elite Soldier", color: "text-red-400" };
+            if(streak < 84) return { rank: "Battle Orc", milestone: "Apex Conditioning", color: "text-red-500" };
+            return { rank: "Ogre Master", milestone: "Apex Predator", color: "text-yellow-500" };
+        }
+
+        function getMndStatus(streak) {
+            if(streak < 7) return { rank: "Unranked", milestone: "Establishing Baseline", color: "text-gray-500" };
+            if(streak < 14) return { rank: "Student", milestone: "Baseline Rhythm Established", color: "text-blue-300" };
+            if(streak < 21) return { rank: "Recluse", milestone: "Sensory Dampening Active", color: "text-blue-400" };
+            if(streak < 28) return { rank: "Hermit", milestone: "Fretboard/Language Automation", color: "text-purple-400" };
+            if(streak < 56) return { rank: "Monk", milestone: "Synthesis Gate 1 Active", color: "text-yellow-400" };
+            if(streak < 84) return { rank: "Elder Monk", milestone: "High-Tier Resilience", color: "text-yellow-500" };
+            return { rank: "Sage", milestone: "Peak Mental Sovereignty", color: "text-white text-shadow" };
+        }
+
+        function updateDashboard() {
+            UI.sessionDay.innerText = state.sessionDay.toString().padStart(2, '0');
+
+            UI.wilPoints.innerText = state.wil.points;
+            UI.wilStreak.innerText = `${state.wil.streak} Days`;
+            const wilStats = getWilStatus(state.wil.points);
+            UI.wilRank.innerText = wilStats.rank;
+            UI.wilRank.className = `font-bold text-lg ${wilStats.color}`;
+            UI.wilBoundary.innerText = wilStats.bounds;
+
+            UI.vitPoints.innerText = state.vit.points;
+            UI.vitStreak.innerText = `${state.vit.streak} Days`;
+            const vitStats = getVitStatus(state.vit.streak);
+            UI.vitRank.innerText = vitStats.rank;
+            UI.vitRank.className = `font-bold text-lg ${vitStats.color}`;
+            UI.vitMilestone.innerText = vitStats.milestone;
+
+            UI.mndPoints.innerText = state.mnd.points;
+            UI.mndStreak.innerText = `${state.mnd.streak} Days`;
+            const mndStats = getMndStatus(state.mnd.streak);
+            UI.mndRank.innerText = mndStats.rank;
+            UI.mndRank.className = `font-bold text-lg ${mndStats.color}`;
+            UI.mndMilestone.innerText = mndStats.milestone;
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const borderColors = { 'info': 'border-blue-500', 'success': 'border-green-500', 'warning': 'border-yellow-500', 'danger': 'border-red-500' };
+            
+            toast.className = `bg-black border ${borderColors[type]} p-3 shadow-lg min-w-[250px] animate-fade-in flex items-start`;
+            toast.innerHTML = `<span class="mr-2">></span><span class="text-sm">${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            }, 4000);
+        }
+
+        function showMsgBox(title, message) {
+            document.getElementById('msg-title').innerText = title;
+            document.getElementById('msg-content').innerText = message;
+            document.getElementById('msg-box').style.display = 'flex';
+        }
+
+        function closeMsgBox() {
+            document.getElementById('msg-box').style.display = 'none';
+        }
+
+        async function triggerSplat() {
+            state.wil.points = 0; state.wil.streak = 0;
+            state.vit.points = 0; state.vit.streak = 0;
+            state.mnd.points = 0; state.mnd.streak = 0;
+            
+            const now = new Date();
+            now.setHours(now.getHours() + 48);
+            state.quarantineUnlockTime = now.getTime();
+
+            UI.splatScreen.style.display = 'flex';
+            updateDashboard();
+            await saveStateToFirestore();
+        }
+
+        function acknowledgeSplat() {
+            UI.splatScreen.style.display = 'none';
+            resetFormInputs();
+            updateDashboard();
+        }
+
+        function resetFormInputs() {
+            document.getElementById('chk-cardio').checked = false;
+            document.getElementById('chk-gym').checked = false;
+            document.getElementById('chk-guitar').checked = false;
+            document.getElementById('chk-japanese').checked = false;
+            document.getElementById('rad-secure').checked = true;
+        }
+
+        async function submitDailyLog() {
+            if (!currentUser) {
+                showMsgBox("DB ERROR", "System not connected to database. Please wait or check connection.");
+                return;
+            }
+
+            if (state.quarantineUnlockTime) {
+                const now = new Date().getTime();
+                if (now < state.quarantineUnlockTime) {
+                    const hoursLeft = Math.ceil((state.quarantineUnlockTime - now) / (1000 * 60 * 60));
+                    showMsgBox("QUARANTINE ACTIVE", `System locked. Wait ${hoursLeft} hours before re-initializing.`);
+                    return;
+                } else {
+                    state.quarantineUnlockTime = null;
+                }
+            }
+
+            const cardio = document.getElementById('chk-cardio').checked;
+            const gym = document.getElementById('chk-gym').checked;
+            const guitar = document.getElementById('chk-guitar').checked;
+            const japanese = document.getElementById('chk-japanese').checked;
+            const isBreach = document.getElementById('rad-breach').checked;
+
+            const inputLog = { cardio, gym, guitar, japanese, nicotineBreach: isBreach };
+
+            if (isBreach) {
+                await logInputsToDatabase(inputLog);
+                await triggerSplat();
+                return;
+            }
+
+            state.wil.points += 1;
+            state.wil.streak += 1;
+            let notifications = [];
+
+            const vitGain = (cardio ? 1 : 0) + (gym ? 1 : 0);
+            state.vit.points += vitGain;
+            if (vitGain === 2) {
+                state.vit.streak += 1;
+            } else {
+                if (state.vit.streak > 0) notifications.push("VIT Streak broken! Less than maximum output logged.");
+                state.vit.streak = 0;
+            }
+
+            const mndGain = (guitar ? 1 : 0) + (japanese ? 1 : 0);
+            state.mnd.points += mndGain;
+            if (mndGain === 2) {
+                state.mnd.streak += 1;
+            } else {
+                if (state.mnd.streak > 0) notifications.push("MND Streak broken! Less than maximum output logged.");
+                state.mnd.streak = 0;
+            }
+
+            state.sessionDay += 1;
+            updateDashboard();
+            resetFormInputs();
+
+            showToast("Syncing with Mainframe...", "info");
+            await saveStateToFirestore();
+            await logInputsToDatabase(inputLog);
+            
+            showToast("Daily cycle logged successfully.", "success");
+            notifications.forEach(msg => showToast(msg, "warning"));
+        }
+
+        // Make functions globally accessible for HTML inline event handlers
+        window.closeMsgBox = closeMsgBox;
+        window.acknowledgeSplat = acknowledgeSplat;
+        window.submitDailyLog = submitDailyLog;
+    </script>
+</body>
+</html>
