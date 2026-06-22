@@ -1,55 +1,189 @@
-<!-- ... existing code ... -->
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RE: EVOLUTION - TERMINAL</title>
     <script src="https://cdn.tailwindcss.com"></script>
-<!-- ... existing code ... -->
-<header class="mb-8 border-b-2 border-green-500 pb-4">
-    <div class="flex flex-col md:flex-row justify-between items-end gap-4">
-        <div>
-            <h1 class="text-3xl sm:text-5xl font-bold tracking-tighter">RE: EVOLUTION</h1>
-            <p class="text-sm sm:text-base mt-2 opacity-80">> SYSTEM ARCHITECTURE ARCHIVE v2.0</p>
-<!-- ... existing code ... -->
-    <!-- CUSTOM MESSAGE BOX FOR ERRORS -->
-    <div id="msg-box" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center">
-        <div class="panel-border bg-black p-6 max-w-md w-full mx-4">
-            <h3 id="msg-title" class="text-xl font-bold mb-4 text-yellow-500">SYSTEM MESSAGE</h3>
-            <p id="msg-content" class="mb-6">Content</p>
-            <button onclick="closeMsgBox()" class="w-full border border-green-500 p-2 hover:bg-green-900/30">DISMISS</button>
+    <style>
+        body { 
+            background-color: #050505; 
+            color: #00ff00; 
+            font-family: 'Courier New', Courier, monospace; 
+        }
+        .panel-border { 
+            border: 1px solid #33ff33; 
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.1); 
+        }
+        .text-shadow { text-shadow: 0 0 5px currentColor; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="p-4 sm:p-8 min-h-screen">
+    <div class="max-w-6xl mx-auto">
+        
+        <header class="mb-8 border-b-2 border-green-500 pb-4">
+            <div class="flex flex-col md:flex-row justify-between items-end gap-4">
+                <div>
+                    <h1 class="text-3xl sm:text-5xl font-bold tracking-tighter text-white">RE: EVOLUTION</h1>
+                    <p class="text-sm sm:text-base mt-2 opacity-80">> SYSTEM ARCHITECTURE ARCHIVE v2.0</p>
+                </div>
+                <div class="text-right border border-green-500 p-2 bg-green-900/20">
+                    <p class="text-lg">SESSION DAY: <span id="session-day" class="text-3xl font-bold text-white">01</span></p>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            
+            <!-- WIL TRACK -->
+            <div class="panel-border bg-[#0a0a0a] p-5 flex flex-col relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-green-900 text-white px-2 py-1 text-xs font-bold">WIL</div>
+                <h2 class="text-xl font-bold mb-4 border-b border-green-800 pb-2">WILLPOWER</h2>
+                <div class="flex-grow">
+                    <div class="flex justify-between mb-2"><span>Points:</span> <span id="wil-points" class="font-bold text-white">0</span></div>
+                    <div class="flex justify-between mb-4"><span>Streak:</span> <span id="wil-streak" class="font-bold text-white">0 Days</span></div>
+                    <div class="mb-1 text-xs text-gray-500 uppercase tracking-wider">Current Form</div>
+                    <div id="wil-rank" class="font-bold text-lg text-gray-500 mb-4">Base Slime</div>
+                    <div class="mb-1 text-xs text-gray-500 uppercase tracking-wider">Boundary</div>
+                    <div id="wil-boundary" class="text-sm font-bold text-white h-10">Confinement: Jelebu Road</div>
+                </div>
+            </div>
+
+            <!-- VIT TRACK -->
+            <div class="panel-border bg-[#0a0a0a] p-5 flex flex-col relative overflow-hidden border-red-900 shadow-[0_0_10px_rgba(255,0,0,0.1)]">
+                <div class="absolute top-0 right-0 bg-red-900 text-white px-2 py-1 text-xs font-bold">VIT</div>
+                <h2 class="text-xl font-bold mb-4 border-b border-red-900 pb-2 text-red-500">PHYSICAL</h2>
+                <div class="flex-grow">
+                    <div class="flex justify-between mb-2"><span>Points:</span> <span id="vit-points" class="font-bold text-white">0</span></div>
+                    <div class="flex justify-between mb-4"><span>Streak:</span> <span id="vit-streak" class="font-bold text-white">0 Days</span></div>
+                    <div class="mb-1 text-xs text-gray-500 uppercase tracking-wider">Current Form</div>
+                    <div id="vit-rank" class="font-bold text-lg text-gray-500 mb-4">Base Slime</div>
+                    <div class="mb-1 text-xs text-gray-500 uppercase tracking-wider">Milestone</div>
+                    <div id="vit-milestone" class="text-sm font-bold text-white h-10">Default</div>
+                </div>
+            </div>
+
+            <!-- MND TRACK -->
+            <div class="panel-border bg-[#0a0a0a] p-5 flex flex-col relative overflow-hidden border-blue-900 shadow-[0_0_10px_rgba(0,0,255,0.1)]">
+                <div class="absolute top-0 right-0 bg-blue-900 text-white px-2 py-1 text-xs font-bold">MND</div>
+                <h2 class="text-xl font-bold mb-4 border-b border-blue-900 pb-2 text-blue-400">COGNITIVE</h2>
+                <div class="flex-grow">
+                    <div class="flex justify-between mb-2"><span>Points:</span> <span id="mnd-points" class="font-bold text-white">0</span></div>
+                    <div class="flex justify-between mb-4"><span>Streak:</span> <span id="mnd-streak" class="font-bold text-white">0 Days</span></div>
+                    <div class="mb-1 text-xs text-gray-500 uppercase tracking-wider">Current Form</div>
+                    <div id="mnd-rank" class="font-bold text-lg text-gray-500 mb-4">Unranked</div>
+                    <div class="mb-1 text-xs text-gray-500 uppercase tracking-wider">Synthesis Gate</div>
+                    <div id="mnd-milestone" class="text-sm font-bold text-white h-10">Establishing Baseline</div>
+                </div>
+            </div>
+
         </div>
+
+        <div class="panel-border bg-[#050505] p-6 mb-8 relative">
+            <h2 class="text-2xl font-bold mb-6 text-white">> INITIALIZE DAILY LOG</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                <!-- Left Column (VIT/MND) -->
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-red-500 font-bold mb-3 border-b border-gray-800 pb-1">VIT INPUT (Max +2)</h3>
+                        <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-gray-900 rounded border border-transparent hover:border-gray-800">
+                            <input type="checkbox" id="chk-cardio" class="w-5 h-5 accent-red-600 bg-black border-gray-600 rounded">
+                            <span class="text-gray-300">Cardio: Pass (+1)</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-gray-900 rounded border border-transparent hover:border-gray-800 mt-1">
+                            <input type="checkbox" id="chk-gym" class="w-5 h-5 accent-red-600 bg-black border-gray-600 rounded">
+                            <span class="text-gray-300">Gym: Pass (+1)</span>
+                        </label>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-blue-400 font-bold mb-3 border-b border-gray-800 pb-1">MND INPUT (Max +2)</h3>
+                        <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-gray-900 rounded border border-transparent hover:border-gray-800">
+                            <input type="checkbox" id="chk-guitar" class="w-5 h-5 accent-blue-600 bg-black border-gray-600 rounded">
+                            <span class="text-gray-300">Guitar: Pass (+1)</span>
+                        </label>
+                        <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-gray-900 rounded border border-transparent hover:border-gray-800 mt-1">
+                            <input type="checkbox" id="chk-japanese" class="w-5 h-5 accent-blue-600 bg-black border-gray-600 rounded">
+                            <span class="text-gray-300">Japanese: Pass (+1)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Right Column (WIL / Splat) -->
+                <div class="border border-green-900 p-4 bg-[#0a0a0a]">
+                    <h3 class="text-green-500 font-bold mb-3 border-b border-gray-800 pb-1">WIL INPUT (CRITICAL)</h3>
+                    <p class="text-xs text-gray-400 mb-4">Absolute Zero Nicotine required for continuity. Any breach triggers a Total Cellular Wipe.</p>
+                    
+                    <label class="flex items-center space-x-3 cursor-pointer p-3 bg-green-900/10 border border-green-900 rounded mb-3 transition-colors hover:bg-green-900/30">
+                        <input type="radio" name="wil-status" id="rad-secure" checked class="w-5 h-5 accent-green-500">
+                        <span class="font-bold text-green-400">SECURE: No Breach (+1 WIL)</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 cursor-pointer p-3 bg-red-900/10 border border-red-900 rounded transition-colors hover:bg-red-900/30">
+                        <input type="radio" name="wil-status" id="rad-breach" class="w-5 h-5 accent-red-500">
+                        <span class="font-bold text-red-500">BREACHED: Nicotine Intake</span>
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="submitDailyLog()" class="w-full bg-green-900/20 hover:bg-green-700/40 text-green-400 font-bold py-4 px-6 border-2 border-green-500 transition-colors uppercase tracking-widest text-lg shadow-[0_0_15px_rgba(0,255,0,0.2)]">
+                Execute Log Update
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 flex flex-col gap-2 z-40"></div>
+
+    <!-- Message Box -->
+    <div id="msg-box" class="fixed inset-0 bg-black/90 z-50 hidden flex-col items-center justify-center backdrop-blur-sm">
+        <div class="panel-border bg-black p-6 max-w-md w-full mx-4 border-yellow-500">
+            <h3 id="msg-title" class="text-xl font-bold mb-4 text-yellow-500">> SYSTEM MESSAGE</h3>
+            <p id="msg-content" class="mb-6 text-white text-lg">Content</p>
+            <button onclick="closeMsgBox()" class="w-full border border-green-500 p-3 hover:bg-green-900/30 text-green-400 font-bold uppercase tracking-wider">Dismiss</button>
+        </div>
+    </div>
+
+    <!-- Splat Screen (Cellular Wipe) -->
+    <div id="splat-screen" class="fixed inset-0 bg-red-950/95 z-50 hidden flex-col items-center justify-center p-4 backdrop-blur-md">
+        <h1 class="text-5xl md:text-7xl font-bold text-red-500 mb-4 tracking-tighter text-shadow text-center">TOTAL CELLULAR WIPE</h1>
+        <p class="text-xl md:text-2xl text-red-300 mb-8 max-w-2xl text-center">THE SPLAT CLAUSE HAS BEEN TRIGGERED. ALL EVOLUTIONARY PROGRESS HAS BEEN REDUCED TO ZERO.</p>
+        <div class="panel-border bg-[#050505] p-6 mb-8 max-w-md w-full border-red-500 shadow-[0_0_20px_rgba(255,0,0,0.4)]">
+            <p class="text-red-400 mb-3 text-lg">> Evolution Status: <span class="text-white font-bold">Base Slime</span></p>
+            <p class="text-red-400 mb-3 text-lg">> Map Restriction: <span class="text-white font-bold">Jelebu Road</span></p>
+            <p class="text-red-400 font-bold text-lg">> Quarantine: <span class="text-yellow-500">48 Hours active</span></p>
+        </div>
+        <button onclick="acknowledgeSplat()" class="border-2 border-red-500 bg-red-900/20 text-red-400 hover:bg-red-900/50 hover:text-white px-8 py-4 font-bold tracking-widest uppercase transition-colors">
+            Acknowledge Confinement
+        </button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Setup Firebase Database
-        let firebaseConfig;
-        if (typeof __firebase_config !== 'undefined') {
-            firebaseConfig = JSON.parse(__firebase_config);
-        } else {
-            // DEPLOYMENT NOTE FOR GITHUB: 
-            // Using your custom Firebase configuration
-            firebaseConfig = {
-                apiKey: "AIzaSyCpy4SH8XBFK_kAj_YCkpAtlAWOk7FJeSM",
-                authDomain: "re-evolution-a0a0c.firebaseapp.com",
-                projectId: "re-evolution-a0a0c",
-                storageBucket: "re-evolution-a0a0c.firebasestorage.app",
-                messagingSenderId: "586999729345",
-                appId: "1:586999729345:web:19acf0a2b1e243c0659840",
-                measurementId: "G-JNC2XFPNZ0"
-            };
-        }
+        // Your Exact Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCpy4SH8XBFK_kAj_YCkpAtlAWOk7FJeSM",
+            authDomain: "re-evolution-a0a0c.firebaseapp.com",
+            projectId: "re-evolution-a0a0c",
+            storageBucket: "re-evolution-a0a0c.firebasestorage.app",
+            messagingSenderId: "586999729345",
+            appId: "1:586999729345:web:19acf0a2b1e243c0659840",
+            measurementId: "G-JNC2XFPNZ0"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 're-evolution-tracker';
+        const projectAppId = 're-evolution-tracker';
         let currentUser = null;
 
-        // System State
+        // Default System State
         let state = {
             sessionDay: 1,
             wil: { points: 0, streak: 0 },
@@ -58,7 +192,6 @@
             quarantineUnlockTime: null
         };
 
-        // DOM Elements Maps
         const UI = {
             sessionDay: document.getElementById('session-day'),
             wilPoints: document.getElementById('wil-points'),
@@ -76,35 +209,26 @@
             splatScreen: document.getElementById('splat-screen')
         };
 
-        // Initialize Authentication
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth failed:", error);
-            }
-        };
+        // Sign In Automatically Behind the Scenes
+        signInAnonymously(auth).catch((error) => {
+            console.error("Auth failed:", error);
+            showToast("Database connection failed. Progress will not save.", "danger");
+        });
 
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if (user) {
-                showToast("System Link Established. Accessing DB.", "info");
+                showToast("System Link Established. Accessing Database.", "info");
                 await loadStateFromFirestore();
                 updateDashboard();
             }
         });
 
-        initAuth();
-
-        // Database Functions
         async function loadStateFromFirestore() {
             if (!currentUser) return;
             try {
-                const stateRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'trackerState');
+                // Rule: Save to artifacts/appId/users/userId/trackerState
+                const stateRef = doc(db, 'artifacts', projectAppId, 'users', currentUser.uid, 'trackerState');
                 const docSnap = await getDoc(stateRef);
                 if (docSnap.exists()) {
                     state = docSnap.data();
@@ -119,7 +243,7 @@
         async function saveStateToFirestore() {
             if (!currentUser) return;
             try {
-                const stateRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'trackerState');
+                const stateRef = doc(db, 'artifacts', projectAppId, 'users', currentUser.uid, 'trackerState');
                 await setDoc(stateRef, state);
             } catch (error) {
                 showToast("Error saving state to DB.", "danger");
@@ -129,7 +253,7 @@
         async function logInputsToDatabase(inputs) {
             if (!currentUser) return;
             try {
-                const logsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'dailyLogs');
+                const logsRef = collection(db, 'artifacts', projectAppId, 'users', currentUser.uid, 'dailyLogs');
                 await addDoc(logsRef, {
                     ...inputs,
                     timestamp: new Date().toISOString(),
@@ -140,7 +264,6 @@
             }
         }
 
-        // Logic Helpers
         function getWilStatus(points) {
             if(points < 3) return { rank: "Base Slime", bounds: "Confinement: Jelebu Road", color: "text-gray-500" };
             if(points < 5) return { rank: "Slime (+1)", bounds: "Local: Bukit Panjang", color: "text-green-500" };
@@ -201,8 +324,8 @@
             const toast = document.createElement('div');
             const borderColors = { 'info': 'border-blue-500', 'success': 'border-green-500', 'warning': 'border-yellow-500', 'danger': 'border-red-500' };
             
-            toast.className = `bg-black border ${borderColors[type]} p-3 shadow-lg min-w-[250px] animate-fade-in flex items-start`;
-            toast.innerHTML = `<span class="mr-2">></span><span class="text-sm">${message}</span>`;
+            toast.className = `bg-black border ${borderColors[type]} p-4 shadow-lg min-w-[250px] animate-fade-in flex items-start`;
+            toast.innerHTML = `<span class="mr-3 font-bold ${borderColors[type].replace('border', 'text')}>&gt;</span><span class="text-sm font-bold text-white tracking-wide">${message}</span>`;
             container.appendChild(toast);
             
             setTimeout(() => {
@@ -213,7 +336,7 @@
         }
 
         function showMsgBox(title, message) {
-            document.getElementById('msg-title').innerText = title;
+            document.getElementById('msg-title').innerText = "> " + title;
             document.getElementById('msg-content').innerText = message;
             document.getElementById('msg-box').style.display = 'flex';
         }
@@ -227,6 +350,7 @@
             state.vit.points = 0; state.vit.streak = 0;
             state.mnd.points = 0; state.mnd.streak = 0;
             
+            // Set Quarantine for 48 Hours
             const now = new Date();
             now.setHours(now.getHours() + 48);
             state.quarantineUnlockTime = now.getTime();
@@ -256,6 +380,7 @@
                 return;
             }
 
+            // Check if user is currently under the 48-hour quarantine lock
             if (state.quarantineUnlockTime) {
                 const now = new Date().getTime();
                 if (now < state.quarantineUnlockTime) {
@@ -263,6 +388,7 @@
                     showMsgBox("QUARANTINE ACTIVE", `System locked. Wait ${hoursLeft} hours before re-initializing.`);
                     return;
                 } else {
+                    // Quarantine is over
                     state.quarantineUnlockTime = null;
                 }
             }
@@ -275,16 +401,19 @@
 
             const inputLog = { cardio, gym, guitar, japanese, nicotineBreach: isBreach };
 
+            // Absolute Zero Rule: Any breach triggers Splat
             if (isBreach) {
                 await logInputsToDatabase(inputLog);
                 await triggerSplat();
                 return;
             }
 
+            // Calculate WIL
             state.wil.points += 1;
             state.wil.streak += 1;
             let notifications = [];
 
+            // Calculate VIT (Max Output Required for streak)
             const vitGain = (cardio ? 1 : 0) + (gym ? 1 : 0);
             state.vit.points += vitGain;
             if (vitGain === 2) {
@@ -294,6 +423,7 @@
                 state.vit.streak = 0;
             }
 
+            // Calculate MND (Max Output Required for streak)
             const mndGain = (guitar ? 1 : 0) + (japanese ? 1 : 0);
             state.mnd.points += mndGain;
             if (mndGain === 2) {
@@ -319,6 +449,9 @@
         window.closeMsgBox = closeMsgBox;
         window.acknowledgeSplat = acknowledgeSplat;
         window.submitDailyLog = submitDailyLog;
+        
+        // Initial dashboard render
+        updateDashboard();
     </script>
 </body>
 </html>
