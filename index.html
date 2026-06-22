@@ -40,9 +40,10 @@
                     <h1 class="text-3xl sm:text-5xl font-bold tracking-tighter text-white">RE: EVOLUTION</h1>
                     <p class="text-sm sm:text-base mt-2 opacity-80">> SYSTEM ARCHITECTURE ARCHIVE v2.0 | <span id="user-email" class="text-green-400"></span></p>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <button onclick="toggleCodex()" class="text-xs border border-blue-500 text-blue-400 hover:bg-blue-900/30 px-3 py-1 font-bold tracking-wider transition-colors">CODEX</button>
                     <button onclick="systemLogout()" class="text-xs border border-green-900 text-green-700 hover:bg-green-900/30 px-3 py-1">DISCONNECT</button>
-                    <div class="text-right border border-green-500 p-2 bg-green-900/20">
+                    <div class="text-right border border-green-500 p-2 bg-green-900/20 hidden sm:block">
                         <p class="text-lg">SESSION DAY: <span id="session-day" class="text-3xl font-bold text-white">01</span></p>
                     </div>
                 </div>
@@ -173,6 +174,118 @@
         <button onclick="acknowledgeSplat()" class="border-2 border-red-500 bg-red-900/20 text-red-400 hover:bg-red-900/50 hover:text-white px-8 py-4 font-bold tracking-widest uppercase transition-colors">
             Acknowledge Confinement
         </button>
+    </div>
+
+    <!-- SYSTEM CODEX (RULES ARCHIVE) -->
+    <div id="codex-modal" class="fixed inset-0 bg-[#050505]/95 z-[70] hidden flex-col items-center p-4 sm:p-8 overflow-y-auto backdrop-blur-md">
+        <div class="max-w-5xl w-full border border-gray-700 bg-black p-6 sm:p-10 mb-20 relative shadow-[0_0_30px_rgba(0,100,255,0.1)]">
+            <button onclick="toggleCodex()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-4xl font-bold transition-colors">&times;</button>
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-2 border-b border-gray-700 pb-4">> SYSTEM CODEX & PROTOCOLS</h2>
+            
+            <div class="mt-8 space-y-12 text-sm sm:text-base">
+                
+                <!-- SPLAT & LAWS -->
+                <section>
+                    <h3 class="text-xl font-bold text-red-500 mb-3 uppercase border-l-4 border-red-500 pl-3">The Splat Clause (Permadeath)</h3>
+                    <p class="text-gray-300 mb-2"><span class="font-bold text-white">Trigger:</span> A single puff of nicotine.</p>
+                    <p class="text-gray-300"><span class="font-bold text-white">Consequence:</span> Total Cellular Wipe (0 VIT/MND/WIL), drop to Base Slime, immediate map restriction to Jelebu Road, and a mandatory 48-hour quarantine lock.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-bold text-yellow-500 mb-3 uppercase border-l-4 border-yellow-500 pl-3">Universal System Laws</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-2">
+                        <li><span class="font-bold text-white">The Continuity Law:</span> Ranks require consecutive daily performance. A 0-gain day in a track resets that streak to Day 0.</li>
+                        <li><span class="font-bold text-white">Daily Caps:</span> VIT (Max +2/day), MND (Max +2/day), WIL (Max +1/day).</li>
+                    </ul>
+                </section>
+
+                <!-- WIL TRACK -->
+                <section>
+                    <h3 class="text-xl font-bold text-green-500 mb-3 uppercase border-l-4 border-green-500 pl-3">Track 1: Willpower (WIL)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-green-900 text-green-400">
+                                    <th class="p-2">WIL</th><th class="p-2">Form</th><th class="p-2">Boundary / Permissions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-300">
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">0-2</td><td class="p-2">Base Slime</td><td class="p-2">Confinement: Jelebu Road only</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">3</td><td class="p-2 text-green-500">Slime (+1)</td><td class="p-2 text-green-500">Local Expansion: Bukit Panjang</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">5</td><td class="p-2 text-green-400">Slime (+2)</td><td class="p-2 text-green-400">Beauty World Corridor</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">7</td><td class="p-2 text-blue-400">Slime (Max)</td><td class="p-2 text-blue-400">ISLAND MAP UNLOCK: Full SG</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">14</td><td class="p-2 text-blue-400">Slime (Max)</td><td class="p-2">Island Map Active</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">21</td><td class="p-2 text-blue-400">Slime (Max)</td><td class="p-2 text-purple-400">Physical Crucible Unlocked</td></tr>
+                                <tr class="hover:bg-gray-900/50"><td class="p-2 font-bold text-white">28</td><td class="p-2 text-blue-400">Slime (Max)</td><td class="p-2 text-yellow-400 font-bold">PLANE UNLOCK: Global Travel</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- VIT TRACK -->
+                <section>
+                    <h3 class="text-xl font-bold text-red-500 mb-3 uppercase border-l-4 border-red-500 pl-3">Track 2: Physical (VIT)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-red-900 text-red-500">
+                                    <th class="p-2">Streak</th><th class="p-2">VIT</th><th class="p-2">Rank</th><th class="p-2">Milestone</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-300">
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">7 Days</td><td class="p-2">14</td><td class="p-2 text-green-500">Goblin</td><td class="p-2">Vocation Shift</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">14 Days</td><td class="p-2">28</td><td class="p-2 text-green-400">Goblin (Hob)</td><td class="p-2">Hardened State</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">21 Days</td><td class="p-2">42</td><td class="p-2 text-purple-400">Orc Aspirant</td><td class="p-2 text-purple-400">The Physical Crucible Unlock</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">28 Days</td><td class="p-2">56</td><td class="p-2 text-red-400">Orc</td><td class="p-2">Elite Soldier</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">56 Days</td><td class="p-2">112</td><td class="p-2 text-red-500">Battle Orc</td><td class="p-2">Apex Conditioning</td></tr>
+                                <tr class="hover:bg-gray-900/50"><td class="p-2 font-bold text-white">84 Days</td><td class="p-2">168</td><td class="p-2 text-yellow-500 font-bold">Ogre Master</td><td class="p-2 text-yellow-500 font-bold">Apex Predator</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- MND TRACK -->
+                <section>
+                    <h3 class="text-xl font-bold text-blue-400 mb-3 uppercase border-l-4 border-blue-500 pl-3">Track 3: Cognitive (MND)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-blue-900 text-blue-400">
+                                    <th class="p-2">Streak</th><th class="p-2">MND</th><th class="p-2">Rank</th><th class="p-2">Gate / Trial</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-300">
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">7 Days</td><td class="p-2">14</td><td class="p-2 text-blue-300">Student</td><td class="p-2">Baseline Rhythm</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">14 Days</td><td class="p-2">28</td><td class="p-2 text-blue-400">Recluse</td><td class="p-2">Sensory Dampening</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">21 Days</td><td class="p-2">42</td><td class="p-2 text-purple-400">Hermit</td><td class="p-2">Fretboard/Language Auto</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">28 Days</td><td class="p-2">56</td><td class="p-2 text-yellow-400">Monk</td><td class="p-2 text-yellow-400">Synthesis Gate 1 Active</td></tr>
+                                <tr class="border-b border-gray-800 hover:bg-gray-900/50"><td class="p-2 font-bold text-white">56 Days</td><td class="p-2">112</td><td class="p-2 text-yellow-500">Elder Monk</td><td class="p-2">High-Tier Resilience</td></tr>
+                                <tr class="hover:bg-gray-900/50"><td class="p-2 font-bold text-white">84 Days</td><td class="p-2">168</td><td class="p-2 text-white font-bold text-shadow">Sage</td><td class="p-2 text-white font-bold">Peak Mental Sovereignty</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- CRUCIBLES -->
+                <section class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-gray-800">
+                    <div class="bg-red-900/10 border border-red-900 p-4">
+                        <h4 class="text-red-500 font-bold mb-2">THE PHYSICAL CRUCIBLE</h4>
+                        <p class="text-xs text-gray-400 mb-2">Triggered at 21 WIL + 42 VIT.</p>
+                        <p class="mb-1"><span class="text-white">Engine:</span> 60m Zone 2 Cardio.</p>
+                        <p class="mb-2"><span class="text-white">Load:</span> 200 rep high-threshold compound lifts &lt; 60m.</p>
+                        <p class="text-red-400 text-xs font-bold">Failure = 7-day reset lock.</p>
+                    </div>
+                    <div class="bg-blue-900/10 border border-blue-900 p-4">
+                        <h4 class="text-blue-400 font-bold mb-2">THE SYNTHESIS GATE</h4>
+                        <p class="text-xs text-gray-400 mb-2">Triggered at 28-day MND streak.</p>
+                        <p class="mb-1"><span class="text-white">Audit:</span> 60-Min Deep Work Lock.</p>
+                        <p class="mb-2"><span class="text-white">Execution:</span> Uninterrupted deliberate practice. Zero distraction.</p>
+                        <p class="text-blue-400 text-xs font-bold">Failure = MND streak resets to 0.</p>
+                    </div>
+                </section>
+
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -398,6 +511,17 @@
             updateDashboard();
         }
 
+        function toggleCodex() {
+            const codex = document.getElementById('codex-modal');
+            if (codex.style.display === 'flex') {
+                codex.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            } else {
+                codex.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
         function resetFormInputs() {
             document.getElementById('chk-cardio').checked = false;
             document.getElementById('chk-gym').checked = false;
@@ -474,6 +598,7 @@
         window.closeMsgBox = closeMsgBox;
         window.acknowledgeSplat = acknowledgeSplat;
         window.submitDailyLog = submitDailyLog;
+        window.toggleCodex = toggleCodex;
     </script>
 </body>
 </html>
