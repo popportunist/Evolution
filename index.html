@@ -21,16 +21,30 @@
     </style>
 </head>
 <body class="p-4 sm:p-8 min-h-screen">
-    <div class="max-w-6xl mx-auto">
+    
+    <!-- SYSTEM LOCK SCREEN -->
+    <div id="login-screen" class="fixed inset-0 bg-[#050505] z-[60] flex flex-col items-center justify-center p-4">
+        <h1 class="text-5xl sm:text-7xl font-bold text-white mb-4 tracking-tighter text-shadow">RE: EVOLUTION</h1>
+        <p class="text-green-500 font-mono mb-12 text-lg">> ARCHITECTURE LOCKED. IDENTIFICATION REQUIRED.</p>
+        <button onclick="systemLogin()" class="border-2 border-green-500 bg-green-900/20 text-green-400 hover:bg-green-500 hover:text-black px-10 py-5 font-bold tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(0,255,0,0.2)]">
+            Initialize Google Link
+        </button>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="main-dashboard" class="max-w-6xl mx-auto hidden">
         
         <header class="mb-8 border-b-2 border-green-500 pb-4">
             <div class="flex flex-col md:flex-row justify-between items-end gap-4">
                 <div>
                     <h1 class="text-3xl sm:text-5xl font-bold tracking-tighter text-white">RE: EVOLUTION</h1>
-                    <p class="text-sm sm:text-base mt-2 opacity-80">> SYSTEM ARCHITECTURE ARCHIVE v2.0</p>
+                    <p class="text-sm sm:text-base mt-2 opacity-80">> SYSTEM ARCHITECTURE ARCHIVE v2.0 | <span id="user-email" class="text-green-400"></span></p>
                 </div>
-                <div class="text-right border border-green-500 p-2 bg-green-900/20">
-                    <p class="text-lg">SESSION DAY: <span id="session-day" class="text-3xl font-bold text-white">01</span></p>
+                <div class="flex items-center gap-4">
+                    <button onclick="systemLogout()" class="text-xs border border-green-900 text-green-700 hover:bg-green-900/30 px-3 py-1">DISCONNECT</button>
+                    <div class="text-right border border-green-500 p-2 bg-green-900/20">
+                        <p class="text-lg">SESSION DAY: <span id="session-day" class="text-3xl font-bold text-white">01</span></p>
+                    </div>
                 </div>
             </div>
         </header>
@@ -163,7 +177,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Your Exact Firebase Configuration
@@ -179,6 +193,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
         const db = getFirestore(app);
         const projectAppId = 're-evolution-tracker';
         let currentUser = null;
@@ -193,6 +208,9 @@
         };
 
         const UI = {
+            loginScreen: document.getElementById('login-screen'),
+            mainDashboard: document.getElementById('main-dashboard'),
+            userEmail: document.getElementById('user-email'),
             sessionDay: document.getElementById('session-day'),
             wilPoints: document.getElementById('wil-points'),
             wilStreak: document.getElementById('wil-streak'),
@@ -209,25 +227,39 @@
             splatScreen: document.getElementById('splat-screen')
         };
 
-        // Sign In Automatically Behind the Scenes
-        signInAnonymously(auth).catch((error) => {
-            console.error("Auth failed:", error);
-            showToast("Database connection failed. Progress will not save.", "danger");
-        });
+        // Authentication Methods
+        window.systemLogin = async () => {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Login failed:", error);
+                showMsgBox("AUTH FAILURE", "Failed to secure Google connection. Check your popup blocker or network.");
+            }
+        };
+
+        window.systemLogout = async () => {
+            await signOut(auth);
+            location.reload();
+        };
 
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if (user) {
-                showToast("System Link Established. Accessing Database.", "info");
+                UI.loginScreen.style.display = 'none';
+                UI.mainDashboard.style.display = 'block';
+                UI.userEmail.innerText = user.email;
+                showToast("System Link Secured. Welcome Back.", "info");
                 await loadStateFromFirestore();
                 updateDashboard();
+            } else {
+                UI.loginScreen.style.display = 'flex';
+                UI.mainDashboard.style.display = 'none';
             }
         });
 
         async function loadStateFromFirestore() {
             if (!currentUser) return;
             try {
-                // Rule: Save to artifacts/appId/users/userId/trackerState
                 const stateRef = doc(db, 'artifacts', projectAppId, 'users', currentUser.uid, 'trackerState');
                 const docSnap = await getDoc(stateRef);
                 if (docSnap.exists()) {
@@ -380,7 +412,6 @@
                 return;
             }
 
-            // Check if user is currently under the 48-hour quarantine lock
             if (state.quarantineUnlockTime) {
                 const now = new Date().getTime();
                 if (now < state.quarantineUnlockTime) {
@@ -388,7 +419,6 @@
                     showMsgBox("QUARANTINE ACTIVE", `System locked. Wait ${hoursLeft} hours before re-initializing.`);
                     return;
                 } else {
-                    // Quarantine is over
                     state.quarantineUnlockTime = null;
                 }
             }
@@ -401,19 +431,16 @@
 
             const inputLog = { cardio, gym, guitar, japanese, nicotineBreach: isBreach };
 
-            // Absolute Zero Rule: Any breach triggers Splat
             if (isBreach) {
                 await logInputsToDatabase(inputLog);
                 await triggerSplat();
                 return;
             }
 
-            // Calculate WIL
             state.wil.points += 1;
             state.wil.streak += 1;
             let notifications = [];
 
-            // Calculate VIT (Max Output Required for streak)
             const vitGain = (cardio ? 1 : 0) + (gym ? 1 : 0);
             state.vit.points += vitGain;
             if (vitGain === 2) {
@@ -423,7 +450,6 @@
                 state.vit.streak = 0;
             }
 
-            // Calculate MND (Max Output Required for streak)
             const mndGain = (guitar ? 1 : 0) + (japanese ? 1 : 0);
             state.mnd.points += mndGain;
             if (mndGain === 2) {
@@ -445,13 +471,9 @@
             notifications.forEach(msg => showToast(msg, "warning"));
         }
 
-        // Make functions globally accessible for HTML inline event handlers
         window.closeMsgBox = closeMsgBox;
         window.acknowledgeSplat = acknowledgeSplat;
         window.submitDailyLog = submitDailyLog;
-        
-        // Initial dashboard render
-        updateDashboard();
     </script>
 </body>
 </html>
